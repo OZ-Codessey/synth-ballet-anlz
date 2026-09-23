@@ -67,14 +67,81 @@ REPORT.md 3장에 5개 질문과, 각 질문에 답한 시각화·인사이트�
 
 # How to Run
 
-`data/ballet_training_cleaned_365.csv`로부터 `graphs/`의 9개 시각화를 재현하는 `analysis.py`를 포함합니다( 직접 실행하지 않아도 리포트와 이미지만으로 결과 확인이 가능합니다).
+`data/ballet_training_cleaned_365.csv`로부터 `graphs/`의 11개 시각화를 재현하는 `analysis.py`를 포함합니다.
+<br>
+( 직접 실행하지 않아도 REPORT.md 파일에서 결과 확인이 가능합니다)
 
 ```bash
 pip3 install -r requirements.txt
 python3 analysis.py
 ```
 
+### **♾️ 코랩에서 실행할 때**
+<br>
 
+먼저 데이터파일(data/ballet_training_cleaned_365.csv)을 올린 후 아래 코드를 입력 후 실행 ▶ 1회 합니다.
+<br>
+(나눔폰트 다운로드 후 그래프 저장 폴더를 생성하는 코드입니다.)
+
+```
+import os
+import subprocess
+
+# 코랩에 나눔폰트가 없으면 자동 다운로드 및 캐시 갱신
+try:
+    import matplotlib.font_manager as fm
+    if not any('Nanum' in f.name for f in fm.fontManager.ttflist):
+        subprocess.run(['apt-get', '-qq', 'install', '-y', 'fonts-nanum'], check=True)
+        fm._load_fontmanager(try_read_cache=False)
+except Exception:
+    pass
+
+# 그래프 저장 폴더 자동 생성 (graphs 폴더 없음 에러 방지)
+os.makedirs('graphs', exist_ok=True)
+os.makedirs('data', exist_ok=True)
+
+nanum_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'
+if os.path.exists(nanum_path):
+    font_prop = font_manager.FontProperties(fname=nanum_path)
+    plt.rcParams['font.family'] = 'NanumGothic'
+else:
+    font_prop = font_manager.FontProperties(family='sans-serif')
+
+plt.rcParams['axes.unicode_minus'] = False
+
+def kfont(size=11, weight='normal'):
+    if os.path.exists(nanum_path):
+        return font_manager.FontProperties(fname=nanum_path, size=size, weight=weight)
+    return font_manager.FontProperties(size=size, weight=weight)  
+```
+
+
+이후 아래 코드를 한 번 더 복사해서 붙인 후 실행▶ 합니다.
+<br>
+(코랩에 업로드했던 발레 훈련 CSV 파일을 찾아서 파이썬이 읽을 수 있는 데이터 표(df)로 불러오는 코드입니다.)  
+```
+data_path = 'data/ballet_training_cleaned_365.csv'
+if not os.path.exists(data_path) and os.path.exists('ballet_training_cleaned_365.csv'):
+    data_path = 'ballet_training_cleaned_365.csv'
+
+if not os.path.exists(data_path):
+    raise FileNotFoundError("CSV 파일이 없습니다...")
+
+df = pd.read_csv(data_path)
+```
+
+그다음 아래 코드를 입력 후 실행▶하면 11개의 시각화 파일을 볼 수 있습니다.
+```
+import glob
+from IPython.display import Image, display
+
+images = sorted(glob.glob('graphs/*.png'))
+
+for img_path in images:
+    print(f"\n📁 [{img_path}]")
+    display(Image(filename=img_path, width=750))
+
+```
 
 ## Verification & Reproducibility Principles (검증·재현 원칙)
 
